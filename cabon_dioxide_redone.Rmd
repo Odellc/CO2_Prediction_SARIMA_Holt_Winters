@@ -1,6 +1,6 @@
 ---
 title: 'Final Project: Motor Gasoline'
-author: "Odell, Christopher"
+author: "Odell, Christopher"[^1]
 date: "March 10, 2019"
 output:
   word_document: default
@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo=FALSE, message = FALSE,
 warning = FALSE,  fig.height = 4, fig.width = 7) 
 
 ```
+
+[^1]: Here is my footnote.
 
 ```{r, include=FALSE}
 library(TSA)
@@ -39,7 +41,7 @@ Below is a time plot for the CO2 emissions data. The trend appears to follow a p
 
 #Data Description
 
-The data for this analysis comes from the United States Energy Information Administration. The focus is on carbon dioxide emissions ($CO_2$) from energy consumption by source with an emphasis on motor gasoline, excluding ethanol. The $CO_2$ emissions are in the unit measurement of million megatonne (Mt). I really wanted to focus on environmental data and what the prediction of this impact might look like overtime. I wanted to really focus on a data set that was going to incorporate multiple aspects of time series analysis and so this data fits the analysis for a couple of reasons. One there appeared to be a change over time in the mean of the $CO_2$ units. Second, when looking at the original data as shown below (Figure 1), I saw a visual seasonality. Another detail that I had noticed while examining the series was that there appeared to be a polynomial pattern over time. Performing time series analysis, does require that some assumptions are met. There needed to be enough observations, preferably over 300, and the data gathered has 486 observations which met the length requirement. Another assumption is that the covariance and variance do not change overtime. To meet this assumption there will need to be various time series techniques applied to the data to ensure stationarity. (e.g. differencing, decomposing). 
+The data for this analysis comes from the United States Energy Information Administration. The focus is on carbon dioxide emissions ($CO_2$) from energy consumption by source with an emphasis on motor gasoline, excluding ethanol. The $CO_2$ emissions are reported in million megatonnes (Mt). The data was a monthly measurement over time from January 1973 to June 2013. An initial plot (Figure 1) of the data appeared to show a change in mean for the $CO_2$ over time as well as seasonality. Another detail that I noticed while examining the series was that there appeared to be a polynomial pattern over time. The data has 486 observations which meets the length requirement for time series analysis. 
 
 
 
@@ -58,12 +60,13 @@ mtext("Source: US Energy Info. Admin.", side=1, adj=1.21, line=4, cex=0.65, font
 
 #Model Description:
 
-Since the goal of the analysis was to predict 24 months of future carbon dioxide emission levels using different time series analysis tools, I need to evaluate each of these tools separately. The different tools that are going to be used are: ARMA, (S)ARIMA, Exponential Smoothing, and Spectral Analysis. 
-The first tool is using the ARMA(p,q) modeling, which is comprised of the Autoregressive model (AR) and the Moving-average model (MA). The p term of the ARMA is the portion of the AR while the q term is for the MA portion. 
+Since the goal of the analysis was to predict 24 months of future carbon dioxide emission levels using different time series analysis tools, I needed to evaluate each of these tools separately. The different tools that were used are: ARMA, (S)ARIMA, Holt-Winters Exponential Smoothing. The ARMA model was chosen since it is one of the simpler time series models and would be a useful comparison versus more complex models. The (S)ARIMA model was chosen because of its capability to handle seasonality which was observed in the $CO_2$ data. Holt-Winters Exponential Smoothing is one of the few exponential smoothing models that can handle both change in mean and seasonality. 
 
-Since the goal of the analysis was to predict 24 months of future carbon dioxide emission levels using different time series analysis tools, I need to evaluate each of these tools separately. 
+I wanted to look to see how well the (S)ARIMA model fit in the frequency domain and therefore also used Spectral Analysis. I used the Spectral Analysis to evaluate whether the AR portion of the (S)ARIMA model was an appropriate fit in the frequency domain. 
 
-The first tool is using the ARMA(p,q) modeling, which is comprised of the Autoregressive model (AR) and the Moving-average model (MA). The p term of the ARMA is the portion of the AR while the q term is for the MA portion.
+###ARMA
+
+The ARMA model, which is comprised of the Autoregressive model (AR) and the Moving-average model (MA) was the first model I used. The model equations are shown below. 
 
 $X_t =  \mu + \epsilon_t + \sum\limits_{i=1}^{q}\theta_i\epsilon_{t-i}$
 
@@ -77,16 +80,19 @@ MA model:
 
 $\theta(B) = 1 - \beta_1B - \beta_2B^2 - ... - \beta_qB^q$
 
-Where the q, p are the terms of the ARMA model, the $\phi$ is the Autoregressive operator, and $\theta$ is the Moving-average operator. Addtionally, $\alpha$ is the coefficients for the Autoregression portion of the model and $\beta$ is the coefficietns for the Moving-average porption of the model. 
+Where the p, q are the terms of the ARMA model, the $\phi$ is the Autoregressive operator, and $\theta$ is the Moving-average operator. Addtionally, $\alpha$ is the coefficients for the Autoregression portion of the model and $\beta$ is the coefficietns for the Moving-average portion of the model. 
 
+###(S)ARIMA
 
-The second tool is the $(S)ARIMA(p,d,q) \times (P,D,Q)_s$ model. With AR and MA being the same components of the ARMA model. There some additonal pieces added where the S is added if there is a seasonality compnent, which does apply in this analysis, and the I denoted as (d and D) is the differencing tool. The small (p,d,q) is represented as teh short term correlations (non-seasonality) where the capital (P,D,Q) is the correlations over multiple seasons (seasonality). The s is used to control what type of seasonality that I am dealing with and in this case is a yearly so s is noted as being 12.
+The $(S)ARIMA(p,d,q) \times (P,D,Q)_s$ model was the second model evaluated in the analysis. The AR and MA components were the same as in the ARMA model. The additional component S was added to handle the seasonality portion of the data. The (d, D) are differencing parameters that can help with trend (d) and seasonality (D). The (p,d,q) represented the short term correlations (non-seasonality) and the (P,D,Q) was the correlations over multiple seasons (seasonality). The subscript s was used to control the type of seasonality, which I recognized as yearly.
 
 The model is given by:
 
 $\Phi(B^2)\phi(B)\triangledown\overset{D}{s}\triangledown^dX_t = \Theta(B^s)\theta(B)W_t$
 
-This is made up of the non-seasonal operators: $\phi(B)$ and $\theta(B)$ with the seasonal operators $\Phi(B^s)$ and $\Theta(B^s)$, the portion of the model that is $\triangledown\overset{D}{s}\triangledown^dX_t$ is an seasonal $ARMA(p,q)\times(P,Q)_s$
+This is made up of the non-seasonal operators: $\phi(B)$ and $\theta(B)$ with the seasonal operators $\Phi(B^s)$ and $\Theta(B^s)$, the portion of the model that is $\triangledown\overset{D}{s}\triangledown^dX_t$ was the seasonal differencing $ARMA(p,q)\times(P,Q)_s$
+
+### Holt-Winters Exponential Smoothing
 
 The third method mentioned is the Holt-Winters - Exponential smoothing. The model is broken down into three parts. Each model part is a smoothing method, one for the level $\ell_{t}$, one for the trend $b_{t}$ , and one for the seasonal component $s_{t}$ , with corresponding smoothing parameters $\alpha$, $\beta^*$ and $\gamma$. I use m to denote the frequency of the seasonality, i.e., the number of seasons in a year.
 
@@ -95,37 +101,35 @@ $$\begin{align*}
   \hat{y}_{t+h|t} &= \ell_{t} + hb_{t} + s_{t+h-m(k+1)} \\
   \ell_{t} &= \alpha(y_{t} - s_{t-m}) + (1 - \alpha)(\ell_{t-1} + b_{t-1})\\
   b_{t} &= \beta^*(\ell_{t} - \ell_{t-1}) + (1 - \beta^*)b_{t-1}\\
-  s_{t} &= \gamma (y_{t}-\ell_{t-1}-b_{t-1}) + (1-\gamma)s_{t-m},
+  s_{t} &= \gamma (y_{t}-\ell_{t-1}-b_{t-1}) + (1-\gamma)s_{t-m}
 \end{align*}$$
 
-where k is the integer part of $(h-1)/m$, this ensures that the estimates of the seasonal indices used for forecasting come from the final year of the sample. The level equation shows a weighted average between the seasonally adjusted observation $(y_{t} - s_{t-m})$ and the non-seasonal forecast $(\ell_{t-1}+b_{t-1})$ for time t .The seasonal equation shows a weighted average between the season, $(y_{t}-\ell_{t-1}-b_{t-1})$, and the seasonal before it last year.
+where k is the integer part of $(h-1)/m$, this ensures that the estimates of the seasonal indices used for forecasting come from the final year of the sample. The level equation shows a weighted average between the seasonally adjusted observation $(y_{t} - s_{t-m})$ and the non-seasonal forecast $(\ell_{t-1}+b_{t-1})$ for time t.The beta equation $\beta^*(\ell_{t} - \ell_{t-1})$ shows an adjustment for the previous observation with the $(1 - \beta^*)b_{t-1}$ being the adjustment for moving average trend. The seasonal equation shows a weighted average between the season, $(y_{t}-\ell_{t-1}-b_{t-1})$, and the seasonal before it last year.
 
-The forth method is the Spectral Analysis. 
+### Spectral Analysis
+
+The fourth portion of the analysis I looked at the data on the frequency domain instead of the time domain through Spectral Analysis. The equation for spectral analysis can be found below:
 
 $$\begin{align*}
-
-\gamma(k) = \int_\pi^0 \!cos(wk)dF(w)\\
-
-f(w) = \frac{dF(w)}{dw}\\
-
-
+  \gamma(k) &= \int_\pi^0 \!cos(wk)dF(w)\\
+  f(w) &= \frac{dF(w)}{dw}\\
 \end{align*}$$
 
-$\gamma(k)$ is the auto-covaraince function, $F(w)$ is the spectral distribution function and is the contribution to the variance from the frequency of 0 to $w$. And $f(w)dw$ is approximtely the contribution on the variance with frequencies in the range $(w, w+dw)$
+$\gamma(k)$ is the auto-covariance function, $F(w)$ is the spectral distribution function and is the contribution to the variance from the frequency of 0 to $w$. And $f(w)dw$ is approximtely the contribution on the variance with frequencies in the range $(w, w+dw)$.
 
-This four different model methods were used to gather a deeper understanding of the data, and to find a model for prediction. 
+These four different model methods were used to gather a deeper understanding of the data, and to find a model for prediction.
 
 
 ###ARMA Modelling
 
 ####Decomposing Trend
 
-As noted above, I observed both trend and seasonality components in the emissions data. To fit an ARMA model, I needed to first estimate the trend using a locally weighted regression (loess) on a monthly frequency. The loess, a type of smoothing method, was selected after also considering a linear model due to two advantages: first, the non-parametric features of the loess smooth are appropriate for both normal and non-normally distributed data, and second, a linear model would not be appropriate for this dataset due to large fluctuations in the long term mean change in the emissions. Next, we plotted the loess against the observed values as shown below. When selected the level of smoothing for the loess it is important to address this process from multiple angles. The controlling mechanisim in the loess is the span which gave me the ability to control a level of fit to remove the trend from the data. The loess model fits would be subtracted from the time series model to remove trend, the challenge is finding a good enough of a fit for the loess. 
+I observed both trend and seasonality components in the emissions data. To fit an ARMA model, I needed to first estimate the trend using a locally weighted regression (loess) on a monthly frequency and then subtract it from the observations. I selected the loess, a type of smoothing method, after also considering a linear model due to two advantages: first, the non-parametric features of the loess smooth are appropriate for both normal and non-normally distributed data, and second, a linear model would not be appropriate for this dataset due to large fluctuations in the long term mean change in the emissions. The controlling mechanism in the loess is the span which gave me the ability to control a level of fit to remove the trend from the data. 
 
-I addressed this issue with comparing eight different model fits, with the caution that I could overfit the model in mind. I know that the lower the span of the model the rougher the model would get and the closer I would get to overfitting. I started in the range of 0.30 and worked down in increments of 2.5. I found that 0.30 was not sufficent enough to remove the trend, as it left the auto-correlation function (ACF) plot with a pattern far outside of what I had expected. When I got as low as 0.15 I really noticed the overfitting of the data with the pattern drastically changing the ACF results for the worse. The most appropriate span I found for the loess model was 0.20 which gave me a model fit that seemed to control the results of the ACF and partial autocorrelation function (PACF) with the most accurancy which is the level that I had proceeded forward with. 
+I needed to address the challenge of finding the appropriate span to sufficiently estimate the trend without overfitting the data. I addressed this issue by comparing eight different model fits. I started with the span of 0.30 and worked down in increments of 0.025. I found that 0.30 was not sufficient to remove the trend, as it left the auto-correlation function (ACF) plot with a pattern that still showed a trend. When I got as low as 0.15 in the span, I noticed the overfitting of the data with the pattern in the ACF increasing correlation versus lag 1. The most appropriate span I found for the loess model was 0.20 which gave me a model fit that seemed to control the results of the ACF and partial autocorrelation function (PACF).
 
-
-The plot series below (Figure 2) shows a smooth trend, with the blue line showing the estimated trend and the black points and line showing the emissions time series. The loess on a monthly frequency was a close fit to the actual observations. Therefore, I removed the estimated trend from the observed emissions data and proceeded with the analysis. The second plot (Figure 3) below shows the time series excluding the estimated trend.  
+The plot series below (Figure 2) shows a smooth trend, with the blue line showing the estimated trend and the black points and line showing the emissions time series. The loess on a monthly frequency was a close fit to the actual observations. Therefore, I removed the estimated trend from the observed emissions data and proceeded with the analysis. The second plot (Figure 3) below shows the time series excluding the estimated trend.
+  
 
 
 ```{r, echo=FALSE}
@@ -159,7 +163,7 @@ plot(trend.res, xlab = "Year", ylab = "Residuals after removing trend", main="LO
 title(sub = "Figure 3",
       cex.sub = 0.75, font.sub = 3, col.sub = "black")
 
-anova(df_ts.loess,df_ts.loess1,df_ts.loess2, df_ts.loess3)
+#anova(df_ts.loess,df_ts.loess1,df_ts.loess2, df_ts.loess3)
 
 
 ```
@@ -167,7 +171,8 @@ anova(df_ts.loess,df_ts.loess1,df_ts.loess2, df_ts.loess3)
 
 ####Decomposing Seasonality
 
-As seen in the residuals plot (Figure 3) of the data after removing the trend, there is still strong annual seasonality. This is not surprising, as driving habits typically fluctuate with the seasons. Therefore, to understand the seasonality of the $CO_2$ emissions, I calculated the 12-month moving average of the emissions of the time series without the trend and ploted five years (Figure 4) to demonstrate the shape of the seasonality. The resulting fit shows the decrease in driving during the off season appears to have a greater impact on the emissions than the increase in driving during the peak season. The impact is shown by how far the top peak is from zero and how far the bottom peak is from zero. Just as a reminder that the data started in June and not in Janaury.
+As seen in the residuals plot (Figure 3) of the data after removing the trend, there is still strong annual seasonality. This is not surprising, as driving habits typically fluctuate with the seasons. Therefore, to understand the seasonality of the $CO_2$ emissions, I calculated the 12-month moving average of the emissions of the time series without the trend. Five years of the data are plotted below (Figure 4) to demonstrate the shape of the seasonality. The resulting fit shows the decrease in driving during the winter months which appears to have a greater impact on the emissions than the increase in driving during the peak season. The impact is shown by how far the top peak is from zero and how far the bottom peak is from zero.
+
 
 ```{r, echo=FALSE, fig.height=3}
 
@@ -187,9 +192,10 @@ title(sub = "Figure 4",
 
 ####Residual Analysis (Stationary Series)
 
-The final step in fitting the ARMA model was to derive the stationary series (residual noise) by subtracting the seasonal fit from the emissions data that was already excluding the trend. To confirm the effectiveness of the ARMA model, I examined the mean, ACF, and PACF.  
+The final step in fitting the ARMA model was to derive the stationary series (residual noise) by subtracting the seasonal fit from the trend-adjusted emissions data. To confirm the effectiveness of the ARMA model, I examined the mean, ACF, and PACF.
 
-Looking at the mean, it appears that the ARMA model effectively removed non-stationarity, because the mean is pratically zero at 1.480402e-17. The stationary series has a low point in 2009 which could be an outlier, with a couple of high points early on. However, looking at the ACF (Figure 6), where a unit lag is equal to one month, there is a strong correlation with previous months, indicating that the result after fitting the ARMA model is not stationary. The ACF is outside of the standard deviation after the initial decrease to zero, which occurs at a lag of 4. The ACF for the previous three months is the strongest, with a correlation value above 0.25. Further, there is a negative correlation beyond a lag of 9. The PACF (Figure 7) also shows a strong regular correlation with values above zero at regular intervals. This also indicates a non-stationary series, due to the fact that there is still regular correlation after removing the trend and seasonality. Therefore, I found the ARMA model to not be sufficient fit to this time series, and proceed forward to examine the fit of a Seasonal ARIMA model without conducting prediction. 
+Looking at the mean, it appears that the ARMA model effectively removed non-stationarity, because the mean was practically zero at 1.480402e-17. The stationary series has a low point in 2009 which could be an outlier, with a couple of high points early on. However, looking at the ACF (Figure 6), where a unit lag is equal to one month, there is a strong correlation with previous months, indicating that the result after fitting the ARMA model is not stationary. The ACF is outside of the standard deviation after the initial decrease to zero, which occurs at a lag of 4 months. The ACF for the previous three months is the strongest, with a correlation value above 0.25. Further, there is a negative correlation beyond a lag of 7. The PACF (Figure 7) also shows a strong regular correlation with values above zero at regular intervals. This also indicates a non-stationary series, due to the fact that there is still regular correlation after removing the trend and seasonality. Therefore, I found the ARMA model to not be a sufficient fit to this time series and proceeded forward to examine the fit of a Seasonal ARIMA model without conducting prediction.
+
 
 ```{r, echo=FALSE, fig.height=3}
 
@@ -206,7 +212,7 @@ par(mfrow = c(1, 2))
 co2_acf <- acf(co2.random, na.action = na.pass, main = "Residual Noise, ACF")
 title(sub = "Figure 6",
       cex.sub = 0.75, font.sub = 3, col.sub = "black")
-co2_pacf <- pacf(co2.random, na.action = na.pass, "Residual Noise, PACF")
+co2_pacf <- pacf(co2.random, na.action = na.pass, main = "Residual Noise, PACF")
 title(sub = "Figure 7",
       cex.sub = 0.75, font.sub = 3, col.sub = "black")
 
@@ -215,11 +221,11 @@ title(sub = "Figure 7",
 
 ###Seasonal ARIMA Modeling
 
-In the seasonal ARIMA model, it is not standard to remove the trend and seasonality like the ARMA approach discussed in the preceding section; instead I rely on differencing completed by the $(d,D)$ part of the model to produce a stationary series that fitted with the appropriate time series model. 
+In the Seasonal ARIMA model, it is not standard to remove the trend and seasonality like the ARMA approach discussed in the preceding section; instead I rely on differencing completed by the $(d,D)$ part of the model to produce a stationary series that fits with the appropriate time series model. 
 
 ####Differencing to Remove Trend and Seasonality
 
-To remove trend and seasonality I had considered differencing with lag 1 to remove the trend and then with lag 12 to remove the monthly seasonality. 
+To remove trend and seasonality I had considered differencing with lag 1 to remove the trend and then with lag 12 to remove the monthly seasonality.
 
 ```{r , echo=FALSE}
 #
@@ -253,15 +259,16 @@ title(sub = "Figure 9",
 
 ```
 
-The plot of the 1st order difference (Figure 8) is centered about zero and I did not see a visible change in the mean that would indicate that the trend was not been removed. The same can be said for the 1st and 12th order differencing plot (Figure 9), although I was suspicious still with the area around 2009 where variance decreases. But in general, the differencing suggested in the plots above appeared appropriate for the time series of this data.  
+The plot of the 1st order difference (Figure 8) is centered about zero and I did not see a visible change in the mean that would indicate that the trend had not been removed. The same can be said for the 1st and 12th order differencing plot (Figure 9), although I was suspicious still with the area around 2009 where variance decreases. But in general, the differencing suggested in the plots above appeared appropriate for the time series of this data. 
 
 ####Selecting a Time Series Model
 
-To esnure the appropriateness of the model, I start by examining the ACF and PACF of the differenced data.
+To ensure the appropriateness of the model, I started by examining the ACF and PACF of the differenced data.
 
-These plots are signifantly more 'messy' and more open to interpretation. Starting with the non-seasonal ARIMA model portion, the ACF (Figure 10) shows a cutoff after lag 1, which is indicative of a MA(1) model. The PACF (Figure 11) is a bit more complicated and I saw either a cutoff after lag 2 (suggesting AR(2)) or a decay that is indicative of an ARMA model.  
+These plots are harder to interpret and have a little more subjectivity in them. I started looking at the non-seasonal ARIMA model portion, the ACF (Figure 10) shows a cutoff after lag 1, which is indicative of a MA(1) model. The PACF (Figure 11)was a bit more complicated and I saw either a cutoff after lag 2 (suggesting AR(2)) or a decay that is indicative of an ARMA model.
 
-Looking at the seasonal portion of the model (Figure 10), the ACF seems to show a gradual decay which is indicative of an ARMA model.  The PACF (Figure 12) shows what might be an AR(2) behavior or perhaps nothing at all.  
+Looking at the seasonal portion of the model (Figure 10), the ACF seems to show a gradual decay which is indicative of an ARMA model. The PACF (Figure 12) shows what might be an AR(2) behavior or perhaps nothing at all.
+
 
 ```{r, echo=FALSE}
 #ACF and PACF of differenced data
@@ -279,8 +286,7 @@ title(sub = "Figure 11",
 ```
 
 
-
-Given this evidence, I examined the suitability of the following models:  
+Given the results of the plots above, I examined the suitability of the following models:  
 
 * Model 1: $ARIMA(1,1,1)x(1,1,1)_{12}$ 
 * Model 2: $ARIMA(1,1,2)x(1,1,1)_{12}$ 
@@ -291,7 +297,7 @@ Given this evidence, I examined the suitability of the following models:
 * Model 7: $ARIMA(0,1,1)x(2,1,1)_{12}$ 
 * Model 8: $ARIMA(2,1,0)x(2,1,1)_{12}$ 
 
-The models as mentioned earlier have the components of $(p,d,q)\times(P,D,Q)$ with the (p,P) as the Autoregressive portion, (d,D) as the differencing of trend and seasonality respectively, and (q,Q) as the Moving-average portion. The 12 which was indicated earlier as $m$ is the seasonal component that I had choosen and in this case would be one year. To assess each model, I fitted the least squares approach with a rank based on their AIC value. The model with the lowest AIC is the model that I would proceed forward with as the best fit and hopefully keep in mind to balance model complexity.
+The models as mentioned earlier have the components of $(p,d,q)×(P,D,Q)$ with the $(p,P)$ as the Autoregressive portion, $(d,D)$ as the differencing of trend and seasonality respectively, and $(q,Q)$ as the Moving-average portion. The subscript 12 which was indicated earlier as $m$ is the seasonal component that I had choosen and in this case would be one year. To assess each model, I fitted the least squares approach with a rank based on their AIC value. The model with the lowest AIC is the model that I would proceed forward with as the best fit.
 
 ```{r, echo=FALSE}
 
@@ -347,7 +353,7 @@ Model 8, $ARIMA(2,1,0)x(2,1,1)_{12}$ showed to be the best fit with an AIC score
 
 ####SARIMA Model Diagnostics
 
-I started with the basic model diagnostic plots (Figure 12). The residuals did not appear to have any trend and the variance looked consistent throughout. The ACF showed no residual trend to the data and was sufficently 0 after one lag. looking into the p-values for the Ljung-Box statiscs the only area of concern might some of the p-values that hovered near 0.05. Since there were some p-values around the 0.05 area, I wanted to ensure that I had selected the best model and ran some diagnostics on several of the models and found their dianostics to be worse for various reasons.
+I started with the basic model diagnostic plots (Figure 12). The residuals did not appear to have any trend and the variance looked consistent throughout. The ACF showed no residual trend to the data and was sufficiently 0 after one lag. looking into the p-values for the Ljung-Box statistics the only area of concern might some of the p-values that hovered near 0.05. Since there were some p-values around the 0.05 area, I wanted to ensure that I had selected the best model and ran some diagnostics on several of the models and found their diagnostics to be worse for various reasons.
 
 ```{r fig.height=6}
 
@@ -360,7 +366,7 @@ title(sub = "Figure 12",
 
 
 
-Next I looked at the distribution of residuals; if the model is properly fitted, I knew that I should find that the residuals are relatively normal which is shown below Figure 13.
+Next, I looked at the distribution of residuals; if the model is properly fitted, I knew that I should find that the residuals are relatively normal which is shown below Figure 13.
 
 ```{r, fig.height=3 }
 
@@ -371,9 +377,10 @@ title(sub = "Figure 13",
       cex.sub = 0.75, font.sub = 3, col.sub = "black")
 ```
 
-Per the QQ plot above I had found the residuals to look normally distributed. 
+Per the QQ plot above I had found the residuals to look normally distributed.
 
-With this being the main model of interest, I wanted to check this versus that of the auto.arima() function in R. This function would dynamically fit a model with numerious possibilities. I had choosen to use the criteria of AIC, to stay consistent with how my models were selected by hand. I also wanted to limit the complexity of the model to ensure that the computation time was reaasonable and I did this by maximizing the variables of $(p,P,q,Q)$ to 4.
+I wanted to check the main model I selected versus that of an auto generated method would be using the auto.arima() function in R. This function dynamically fitted a model with numerous possibilities. I had chosen to use the criteria of AIC, to stay consistent with how my models was selected by hand. I also wanted to limit the complexity of the model to ensure that the computation time was reasonable, and I did this by maximizing the variables of $(p,P,q,Q)$ to 4.
+
 
 ```{r}
 #Let R choose a model for us
@@ -388,7 +395,7 @@ mod.auto <- auto.arima(emission,
 mod.auto
 ```
 
-As shown above,R had selected a model fit of $ARIMA(2,1,2)(4,1,2)_{12}$ as the best fit with the AIC is no better than that of model 8 earlier. The diagnostic plots (not shown) are similar. Because the model selected by R dynamically is more complex, and computationally longer I proceeded forward with the model that I had selected (model 8) since the results were visually the same.
+As shown above, R had selected a model fit of $ARIMA(2,1,2)(4,1,2)_{12}$ as the best fit with the AIC appearing comparable to the model 8 earlier. The diagnostic plots (not shown) are similar. Because the model selected by R dynamically is more complex, and computationally longer I proceeded forward with the model that I had selected (model 8) since the results were visually the same.
 
 
 ###Spectral Analysis
