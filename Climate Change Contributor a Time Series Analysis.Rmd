@@ -78,7 +78,7 @@ MA model:
 
 $\theta(B) = 1 - \beta_1B - \beta_2B^2 - ... - \beta_qB^q$
 
-Where the p, q are the terms of the ARMA model, the $\phi$ is the Autoregressive operator, and $\theta$ is the Moving-average operator. Addtionally, $\alpha$ is the coefficients for the Autoregression portion of the model and $\beta$ is the coefficietns for the Moving-average portion of the model. 
+Where the p, q are the terms of the ARMA model, the $\phi$ is the Autoregressive operator, and $\theta$ is the Moving-average operator. Additionally, $\alpha$ is the coefficients for the Autoregression portion of the model and $\beta$ is the coefficients for the Moving-average portion of the model. 
 
 ###(S)ARIMA
 
@@ -102,7 +102,7 @@ $$\begin{align*}
   s_{t} &= \gamma (y_{t}-\ell_{t-1}-b_{t-1}) + (1-\gamma)s_{t-m}
 \end{align*}$$
 
-where k is the integer part of $(h-1)/m$, this ensures that the estimates of the seasonal indices used for forecasting come from the final year of the sample. The level equation shows a weighted average between the seasonally adjusted observation $(y_{t} - s_{t-m})$ and the non-seasonal forecast $(\ell_{t-1}+b_{t-1})$ for time t.The beta equation $\beta^*(\ell_{t} - \ell_{t-1})$ shows an adjustment for the previous observation with the $(1 - \beta^*)b_{t-1}$ being the adjustment for moving average trend. The seasonal equation shows a weighted average between the season, $(y_{t}-\ell_{t-1}-b_{t-1})$, and the seasonal before it last year.
+where k is the integer part of $(h-1)/m$, this ensures that the estimates of the seasonal indices used for forecasting come from the final year of the sample. The level equation shows a weighted average between the seasonally adjusted observation $(y_{t} - s_{t-m})$ and the non-seasonal forecast $(\ell_{t-1}+b_{t-1})$ for time t. The beta equation $\beta^*(\ell_{t} - \ell_{t-1})$ shows an adjustment for the previous observation with the $(1 - \beta^*)b_{t-1}$ being the adjustment for moving average trend. The seasonal equation shows a weighted average between the season, $(y_{t}-\ell_{t-1}-b_{t-1})$, and the seasonal before it last year.
 
 ### Spectral Analysis
 
@@ -113,7 +113,7 @@ $$\begin{align*}
   f(w) &= \frac{dF(w)}{dw}\\
 \end{align*}$$
 
-$\gamma(k)$ is the auto-covariance function, $F(w)$ is the spectral distribution function and is the contribution to the variance from the frequency of 0 to $w$. And $f(w)dw$ is approximtely the contribution on the variance with frequencies in the range $(w, w+dw)$.
+$\gamma(k)$ is the auto-covariance function, $F(w)$ is the spectral distribution function and is the contribution to the variance from the frequency of 0 to $w$. And $f(w)dw$ is approximately the contribution on the variance with frequencies in the range $(w, w+dw)$.
 
 These four different model methods were used to gather a deeper understanding of the data, and to find a model for prediction.
 
