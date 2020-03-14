@@ -383,7 +383,6 @@ mod.auto
 
 As shown above, R selected a model fit of $ARIMA(2,1,2)(4,1,2)_{12}$ with the AIC comparable to model 8. The diagnostic plots (not shown) are similar. Because the model selected by R dynamically is more complex, and computationally longer, and the results are visually the same I proceeded forward my selected model (model 8).
 
-
 ###Spectral Analysis
 
 In contrast to the above methods that focused on modelling in the time domain, spectral analysis focuses on the frequency domain. I performed a brief exploratory spectral analysis to assess the appropriateness of the ARIMA portion of the SARIMA model above (model 8). In Figure 14, I plotted a periodogram to confirm that the seasonal component was annual, using the first order difference series from the SARIMA model above. This periodogram of the first-order differenced series shows peaks at frequencies that are multiples of 1/12, which confirmed the presence of an annual trend. These peaks are rather narrow, suggesting the seasonality is quite regular in this time series.
@@ -441,7 +440,6 @@ title(sub = "Figure 17",
 ```
 
 The simulated spectral density of the AR(2) component takes a similar shape as the true spectral density, albeit somewhat overestimated. This similarity in the distribution helped me to support the notion that model 8 was a good fit for this time series.
-
 
 ## Forecasting
 
@@ -539,8 +537,6 @@ kable(data %>% mutate("Holt-Winters in Range" = data$`Model 8 Lower`< data$`Holt
 In this analysis, I explored multiple methods for modeling the $CO_2$ emissions from motor vehicles between January 1976 and June 2013. I found that the decomposition of the ARMA approach did not yield a stationary series and instead deferred to a SARIMA model that appeared to better fit of the data. The spectrum analysis of the AR(2) component of this SARIMA model was then shown to agree with the spectrum of the $CO_2$ data within a reasonable margin, serving as a validation that the SARIMA model was appropriate for the modelling of this time series. 
 
 The SARIMA model was further tested by forecasting 24 months into the future and comparing the results to predictions from the Holt-Winters exponential smoothing method. These methods agreed in their forecast of the future with high precision, both in terms of trend and seasonality. I therefore conclude that the monthly motor vehicle $CO_2$ emissions time series can successfully be modelled with a $SARIMA(2,1,0)\times(2,1,1)_{12}$ and that of the Holt-Winters. This predictive analysis could lead to further examinations of other models, more complex models or longer predictions. The next step would be to assess the actual predictions and see if the actual $CO_2$ emissions from July 2013 to June of 2015 actually landed in the ranges provided in the model.
-
-
 
 #Appendix A - Source Code
 
