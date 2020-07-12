@@ -31,16 +31,13 @@ colnames(df)[colnames(df)=="Environment..carbon.dioxide.emissions.from.energy.co
 df_ts <-  ts(df$CO2[-487], start = c(1973, 1), frequency = 12) # remove NA at observation 487
 ```
 
-
 #Introduction
 
 $CO_2$ emissions are known to be a key contributor to global climate change. A significant source of $CO_2$ emissions in the United States is from gas powered motor vehicles. To better understand emissions trajectory, I conducted a time series analysis of monthly motor vehicle $CO_2$ emissions in metric megatonnes from gasoline (excluding ethanol) in the United States for the time period between January 1973 and June 2013. I used four different time series techniques to gain a deeper understanding of the data and to set myself up to predict the next 24 months of emission levels. The techniques that I used were ARMA, (S)ARIMA, Holt-Winters Exponential Smoothing, and Spectral Analysis. Each method has a different approach to examining the time series, and my aim was to understand how they can be used to help with prediction analysis. 
 
-
 #Data Description
 
 The data for this analysis comes from the United States Energy Information Administration. The focus is on carbon dioxide emissions ($CO_2$) from energy consumption by source with an emphasis on motor gasoline, excluding ethanol. The $CO_2$ emissions are reported in million megatonnes (Mt). The data was a monthly measurement over time from January 1973 to June 2013. An initial plot (Figure 1) of the data appeared to show a change in mean for the $CO_2$ over time as well as seasonality. Another detail that I noticed while examining the series was that there appeared to be a polynomial pattern over time. The data has 486 observations which meets the length requirement for time series analysis. 
-
 
 
 ```{r, echo=FALSE, fig.height=3}
